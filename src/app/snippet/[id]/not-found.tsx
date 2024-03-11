@@ -1,5 +1,5 @@
 import React from "react";
 
 export default function SnippetNotFound() {
-  return <div>SnippetNotFound</div>;
+  return <div>Snippet Not Found</div>;
 }
