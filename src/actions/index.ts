@@ -10,6 +10,8 @@ export async function updateSnippet(id: number, code: string) {
     data: { code },
   });
 
+  revalidatePath(`/snippet/${id}`);
+
   redirect(`/snippet/${id}`);
 }
 
