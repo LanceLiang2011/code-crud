@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/db";
+import * as actions from "@/actions";
 
 interface Props {
   params: {
@@ -9,14 +10,19 @@ interface Props {
   };
 }
 
-export default async function SnippetShowPage({ params: { id } }: Props) {
+export default async function SnippetShowPage({
+  params: { id: stringId },
+}: Props) {
+  const id = parseInt(stringId);
   const snippet = await prisma.snippet.findUnique({
     where: {
-      id: parseInt(id),
+      id,
     },
   });
 
   if (!snippet) return notFound();
+
+  const deleteSnippetAction = actions.deleteSnippet.bind(null, id);
 
   return (
     <div>
@@ -26,7 +32,9 @@ export default async function SnippetShowPage({ params: { id } }: Props) {
           <Link href={`/snippet/${id}/edit`} className=" p-2 border rounded">
             Edit
           </Link>
-          <button className=" p-2 border rounded">Delete</button>
+          <form action={deleteSnippetAction}>
+            <button className=" p-2 border rounded">Delete</button>
+          </form>
         </div>
       </div>
 
@@ -35,4 +43,10 @@ export default async function SnippetShowPage({ params: { id } }: Props) {
       </pre>
     </div>
   );
+}
+
+export async function generateStaticParams() {
+  const snippets = await prisma.snippet.findMany();
+
+  return snippets.map((s) => ({ id: s.id.toString() }));
 }
